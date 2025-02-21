@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from alembic import context
 
-from src.core.settings import PostgresSettings
+from src.core.config import config as app_config
 from src.models import Base
 
 # this is the Alembic Config object, which provides
@@ -40,7 +40,7 @@ def run_migrations_offline() -> None:
 
     """
     context.configure(
-        url=PostgresSettings().build_dsn(),
+        url=app_config.postgres.build_dsn(),
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -58,7 +58,7 @@ def do_run_migrations(connection: Connection) -> None:
 
 
 async def run_async_migrations() -> None:
-    connectable: AsyncEngine = create_async_engine(url=PostgresSettings().build_dsn())
+    connectable: AsyncEngine = create_async_engine(url=app_config.postgres.build_dsn())
 
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)

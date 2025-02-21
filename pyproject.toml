@@ -10,11 +10,34 @@ python = "^3.13"
 fastapi = "^0.115.8"
 uvicorn = "^0.34.0"
 pydantic-settings = "^2.7.1"
-sqlalchemy = {extras = ["asyncio"], version = "^2.0.38"}
+sqlalchemy = { extras = ["asyncio"], version = "^2.0.38" }
 asyncpg = "^0.30.0"
 dishka = "^1.4.2"
 alembic = "^1.14.1"
+python-jose = {extras = ["cryptography"], version = "^3.4.0"}
+bcrypt = "^4.2.1"
+pydantic = {extras = ["email"], version = "^2.10.6"}
 
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.9.7"
+
+[tool.ruff]
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "ALL"
+]
+ignore = [
+    "RUF001", "RUF002", "RUF003", "RUF012",
+    "COM812", "ISC001",
+    "D",
+    "RET502", "RET503",
+    "ANN401",
+    "I001", "INP001",
+    "FBT001", "FBT002",
+]
 
 [build-system]
 requires = ["poetry-core"]

@@ -25,7 +25,9 @@ class Chat(IdMixin, TimestampMixin, Base):
     name: Mapped[str] = mapped_column(String(100))
     type: Mapped[ChatType]
 
-    group_id: Mapped[UUID | None] = mapped_column(ForeignKey("groups.id"))
+    group_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("groups.id", ondelete="CASCADE")
+    )
     group: Mapped["Group"] = relationship(back_populates="chat")
 
     messages: Mapped[list["Message"]] = relationship(back_populates="chat")
@@ -43,8 +45,8 @@ class Chat(IdMixin, TimestampMixin, Base):
 class ChatMember(IdMixin, CreatedDateMixin, Base):
     __tablename__ = "chat_members"
 
-    chat_id: Mapped[UUID] = mapped_column(ForeignKey("chats.id"))
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    chat_id: Mapped[UUID] = mapped_column(ForeignKey("chats.id", ondelete="CASCADE"))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
 
     chat: Mapped["Chat"] = relationship(back_populates="members")
     user: Mapped["User"] = relationship()

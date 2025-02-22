@@ -38,6 +38,7 @@ ignore = [
     "I001", "INP001",
     "FBT001", "FBT002",
     "PLR0913",
+    "TRY003", "EM101", "EM102"
 ]
 
 [build-system]

@@ -18,7 +18,7 @@ class Group(IdMixin, TimestampMixin, Base):
 
     title: Mapped[str]
 
-    creator_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    creator_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     creator: Mapped["User"] = relationship(back_populates="created_groups")
 
     chat: Mapped["Chat"] = relationship(back_populates="group")
@@ -29,10 +29,12 @@ class Group(IdMixin, TimestampMixin, Base):
 class GroupMember(IdMixin, Base):
     __tablename__ = "group_members"
 
-    group_id: Mapped[UUID] = mapped_column(ForeignKey("groups.id"))
-    group: Mapped["Group"] = relationship(back_populates="members")
+    group_id: Mapped[UUID] = mapped_column(ForeignKey("groups.id", ondelete="CASCADE"))
+    group: Mapped["Group"] = relationship(
+        back_populates="members", cascade="all, delete"
+    )
 
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped["User"] = relationship()
 
     joined_at: Mapped[datetime] = mapped_column(

@@ -1,11 +1,10 @@
-from datetime import datetime, UTC
 from uuid import UUID
 
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.models.message import Message, MessageReadState
+from src.models.message import Message
 
 
 class MessageRepository:
@@ -46,4 +45,3 @@ class MessageRepository:
         )
         result = await self._session.scalars(stmt)
         return list(result)
-

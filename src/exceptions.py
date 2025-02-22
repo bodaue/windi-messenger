@@ -42,6 +42,11 @@ class ChatNotFoundException(ApplicationException):
     detail = "Chat not found"
 
 
+class GroupNotFoundException(ApplicationException):
+    status_code = status.HTTP_404_NOT_FOUND
+    detail = "Group not found"
+
+
 class InvalidChatParticipantException(ApplicationException):
     status_code = status.HTTP_400_BAD_REQUEST
     detail = "Invalid chat participant"
@@ -50,3 +55,8 @@ class InvalidChatParticipantException(ApplicationException):
 class MessageNotFoundException(ApplicationException):
     status_code = status.HTTP_404_NOT_FOUND
     detail = "Message not found"
+
+
+class AccessDenied(ApplicationException):
+    status_code = status.HTTP_403_FORBIDDEN
+    detail = "Access denied"

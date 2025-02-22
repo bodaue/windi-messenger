@@ -16,10 +16,10 @@ if TYPE_CHECKING:
 class Message(IdMixin, TimestampMixin, Base):
     __tablename__ = "messages"
 
-    chat_id: Mapped[UUID] = mapped_column(ForeignKey("chats.id"))
+    chat_id: Mapped[UUID] = mapped_column(ForeignKey("chats.id", ondelete="CASCADE"))
     chat: Mapped["Chat"] = relationship(back_populates="messages")
 
-    sender_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    sender_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     sender: Mapped["User"] = relationship()
 
     text: Mapped[str] = mapped_column(String(4096))

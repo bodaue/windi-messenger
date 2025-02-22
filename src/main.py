@@ -1,11 +1,12 @@
 import uvicorn
 from fastapi import FastAPI
 
-from src.api.v1 import auth
+from src.api.v1 import auth, chat
 
 
 def setup_routers(app: FastAPI) -> None:
     app.include_router(auth.router)
+    app.include_router(chat.router)
 
 
 def create_application() -> FastAPI:

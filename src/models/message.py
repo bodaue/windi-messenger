@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import String, ForeignKey, Boolean, DateTime, UniqueConstraint
+from sqlalchemy import String, ForeignKey, DateTime, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.base import Base, IdMixin, TimestampMixin
@@ -40,8 +40,9 @@ class MessageReadState(IdMixin, Base):
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped["User"] = relationship()
 
-    is_read: Mapped[bool] = mapped_column(Boolean, default=False)
-    read_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    read_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
     __table_args__ = (
         UniqueConstraint("message_id", "user_id", name="uq_message_read_state"),

@@ -14,9 +14,9 @@ sqlalchemy = { extras = ["asyncio"], version = "^2.0.38" }
 asyncpg = "^0.30.0"
 dishka = "^1.4.2"
 alembic = "^1.14.1"
-python-jose = {extras = ["cryptography"], version = "^3.4.0"}
+python-jose = { extras = ["cryptography"], version = "^3.4.0" }
 bcrypt = "^4.2.1"
-pydantic = {extras = ["email"], version = "^2.10.6"}
+pydantic = { extras = ["email"], version = "^2.10.6" }
 
 
 [tool.poetry.group.dev.dependencies]
@@ -37,6 +37,7 @@ ignore = [
     "ANN401",
     "I001", "INP001",
     "FBT001", "FBT002",
+    "PLR0913",
 ]
 
 [build-system]

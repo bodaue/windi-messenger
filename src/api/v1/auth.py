@@ -8,7 +8,7 @@ from src.core.di.services import get_auth_service
 from src.schemas.user import UserRegister, UserLogin, UserInfo, Token
 from src.services.auth import AuthService
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)

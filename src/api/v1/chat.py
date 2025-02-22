@@ -8,7 +8,7 @@ from src.core.di.user import CurrentUser
 from src.schemas.chat import ChatCreate, ChatInfo
 from src.services.chat import ChatService
 
-router = APIRouter(prefix="/chats", tags=["chats"])
+router = APIRouter(prefix="/chats", tags=["Chats"])
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)

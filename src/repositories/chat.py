@@ -18,7 +18,10 @@ class ChatRepository:
         return chat
 
     async def get_by_id(self, chat_id: UUID) -> Chat | None:
-        return await self._session.get(Chat, chat_id)
+        stmt = (
+            select(Chat).where(Chat.id == chat_id).options(selectinload(Chat.members))
+        )
+        return await self._session.scalar(stmt)
 
     async def get_user_chats(self, user_id: UUID) -> Iterable[Chat]:
         stmt = (

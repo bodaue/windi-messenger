@@ -21,5 +21,6 @@ class ChatInfo(BaseModel):
     name: str
     type: ChatType
     members: list[ChatMemberInfo]
+    group_id: UUID | None
 
     model_config = ConfigDict(from_attributes=True)

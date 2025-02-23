@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import String, ForeignKey, DateTime, UniqueConstraint, func
+from sqlalchemy import String, ForeignKey, DateTime, UniqueConstraint, func, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.base import Base, IdMixin, TimestampMixin
@@ -27,7 +27,9 @@ class Message(IdMixin, TimestampMixin, Base):
     read_states: Mapped[list["MessageReadState"]] = relationship(
         back_populates="message"
     )
-
+    __table_args__ = (
+        Index("ix_messages_chat_created", "chat_id", "created_at"),
+    )
 
 class MessageReadState(IdMixin, Base):
     __tablename__ = "message_read_states"

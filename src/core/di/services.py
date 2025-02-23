@@ -12,12 +12,10 @@ from src.core.di.repositories import (
     get_message_repository,
     get_message_read_state_repository,
     get_group_repository,
-    get_group_member_repository,
 )
 from src.repositories.chat import ChatRepository
 from src.repositories.chat_member import ChatMemberRepository
 from src.repositories.group import GroupRepository
-from src.repositories.group_member import GroupMemberRepository
 from src.repositories.message import MessageRepository
 from src.repositories.message_read_state import MessageReadStateRepository
 from src.repositories.user import UserRepository
@@ -74,9 +72,6 @@ def get_message_service(
 def get_group_service(
     session: Annotated[AsyncSession, Depends(get_session)],
     group_repository: Annotated[GroupRepository, Depends(get_group_repository)],
-    group_member_repository: Annotated[
-        GroupMemberRepository, Depends(get_group_member_repository)
-    ],
     user_repository: Annotated[UserRepository, Depends(get_user_repository)],
     chat_repository: Annotated[ChatRepository, Depends(get_chat_repository)],
     chat_member_repository: Annotated[
@@ -86,7 +81,6 @@ def get_group_service(
     return GroupService(
         session=session,
         group_repository=group_repository,
-        group_member_repository=group_member_repository,
         user_repository=user_repository,
         chat_repository=chat_repository,
         chat_member_repository=chat_member_repository,

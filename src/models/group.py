@@ -1,11 +1,12 @@
-from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import ForeignKey, DateTime, func, UniqueConstraint, Index
+from sqlalchemy import ForeignKey
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.base import IdMixin, TimestampMixin, Base
 from typing import TYPE_CHECKING
+from src.models.chat import ChatMember
 
 
 if TYPE_CHECKING:
@@ -23,26 +24,6 @@ class Group(IdMixin, TimestampMixin, Base):
 
     chat: Mapped["Chat"] = relationship(back_populates="group")
 
-    members: Mapped[list["GroupMember"]] = relationship(back_populates="group")
-
-
-class GroupMember(IdMixin, Base):
-    __tablename__ = "group_members"
-
-    group_id: Mapped[UUID] = mapped_column(ForeignKey("groups.id", ondelete="CASCADE"))
-    group: Mapped["Group"] = relationship(
-        back_populates="members", cascade="all, delete"
-    )
-
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    user: Mapped["User"] = relationship()
-
-    joined_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
-
-    __table_args__ = (
-        UniqueConstraint("group_id", "user_id", name="uq_group_member"),
-        Index("idx_group_members_group", "group_id"),
-        Index("idx_group_members_user", "user_id"),
-    )
+    @hybrid_property
+    def members(self) -> list[ChatMember]:
+        return self.chat.members

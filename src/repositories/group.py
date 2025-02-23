@@ -4,7 +4,8 @@ from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.models import Group, GroupMember
+from src.models import Group, Chat
+from src.models.chat import ChatMember
 
 
 class GroupRepository:
@@ -21,8 +22,9 @@ class GroupRepository:
             .where(Group.id == group_id)
             .options(
                 selectinload(Group.creator),
-                selectinload(Group.members).selectinload(GroupMember.user),
-                selectinload(Group.chat),
+                selectinload(Group.chat)
+                .selectinload(Chat.members)
+                .selectinload(ChatMember.user),
             )
         )
         return await self._session.scalar(stmt)

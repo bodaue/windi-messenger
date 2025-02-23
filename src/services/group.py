@@ -3,12 +3,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.exceptions import UserNotFoundException, GroupNotFoundException, AccessDenied
 from src.models.chat import Chat, ChatType, ChatMember
-from src.models.group import Group, GroupMember
+from src.models.group import Group
 from src.models.user import User
 from src.repositories.chat import ChatRepository
 from src.repositories.chat_member import ChatMemberRepository
 from src.repositories.group import GroupRepository
-from src.repositories.group_member import GroupMemberRepository
 from src.repositories.user import UserRepository
 from src.schemas.group import GroupCreate, GroupInfo, GroupMemberAdd, GroupMemberRemove
 
@@ -18,14 +17,12 @@ class GroupService:
         self,
         session: AsyncSession,
         group_repository: GroupRepository,
-        group_member_repository: GroupMemberRepository,
         user_repository: UserRepository,
         chat_repository: ChatRepository,
         chat_member_repository: ChatMemberRepository,
     ) -> None:
         self._session = session
         self._group_repository = group_repository
-        self._group_member_repository = group_member_repository
         self._user_repository = user_repository
         self._chat_repository = chat_repository
         self._chat_member_repository = chat_member_repository
@@ -41,10 +38,6 @@ class GroupService:
 
         group = Group(title=data.title, creator=creator)
         await self._group_repository.create(group)
-
-        members = [GroupMember(group=group, user=user) for user in users]
-        members.append(GroupMember(group=group, user=creator))
-        await self._group_member_repository.create_many(members)
 
         chat = Chat(name=data.title, type=ChatType.GROUP, group=group)
         await self._chat_repository.create(chat)
@@ -67,7 +60,6 @@ class GroupService:
         group = await self._get_group_with_access(
             group_id, current_user, creator_only=True
         )
-
         chat = group.chat
 
         for user_id in data.user_ids:
@@ -75,10 +67,8 @@ class GroupService:
             if not user:
                 raise UserNotFoundException(f"User with id {user_id} not found")
 
-            if not any(member.user_id == user.id for member in group.members):
-                member = GroupMember(group=group, user=user)
+            if not any(member.user_id == user.id for member in chat.members):
                 chat_member = ChatMember(chat=chat, user=user)
-                await self._group_member_repository.create(member)
                 await self._chat_member_repository.create(chat_member)
 
         await self._session.commit()
@@ -93,11 +83,15 @@ class GroupService:
         if current_user.id in data.user_ids:
             raise AccessDenied("Cannot remove group creator")
 
-        await self._group_member_repository.delete_members(group_id, data.user_ids)
-        await self._chat_member_repository.delete_members(group.chat.id, data.user_ids)
+        chat = group.chat
+
+        await self._chat_member_repository.delete_members(chat.id, data.user_ids)
 
         await self._session.commit()
-        await self._session.refresh(group)
+
+        self._session.expire(chat)
+        await self._session.refresh(chat)
+
         return GroupInfo.model_validate(group)
 
     async def delete_group(self, group_id: UUID, current_user: User) -> None:
@@ -115,8 +109,9 @@ class GroupService:
         if creator_only and group.creator_id != user.id:
             raise AccessDenied("Access to group denied")
 
+        chat = group.chat
         if not creator_only and not any(
-            member.user_id == user.id for member in group.members
+            member.user_id == user.id for member in chat.members
         ):
             raise AccessDenied("Access to group denied")
 

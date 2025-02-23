@@ -1,10 +1,11 @@
+from datetime import datetime
 from enum import Enum
 from uuid import UUID
 
-from sqlalchemy import String, ForeignKey, CheckConstraint, UniqueConstraint
+from sqlalchemy import ForeignKey, CheckConstraint, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.models.base import Base, IdMixin, TimestampMixin, CreatedDateMixin
+from src.models.base import Base, IdMixin, TimestampMixin
 from typing import TYPE_CHECKING
 
 
@@ -22,14 +23,13 @@ class ChatType(Enum):
 class Chat(IdMixin, TimestampMixin, Base):
     __tablename__ = "chats"
 
-    name: Mapped[str] = mapped_column(String(100))
+    name: Mapped[str]
     type: Mapped[ChatType]
-
     group_id: Mapped[UUID | None] = mapped_column(
-        ForeignKey("groups.id", ondelete="CASCADE")
+        ForeignKey("groups.id", ondelete="CASCADE"), unique=True
     )
-    group: Mapped["Group"] = relationship(back_populates="chat")
 
+    group: Mapped["Group"] = relationship(back_populates="chat")
     messages: Mapped[list["Message"]] = relationship(back_populates="chat")
     members: Mapped[list["ChatMember"]] = relationship(back_populates="chat")
 
@@ -42,15 +42,18 @@ class Chat(IdMixin, TimestampMixin, Base):
     )
 
 
-class ChatMember(IdMixin, CreatedDateMixin, Base):
+class ChatMember(Base):
     __tablename__ = "chat_members"
 
-    chat_id: Mapped[UUID] = mapped_column(ForeignKey("chats.id", ondelete="CASCADE"))
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-
-    chat: Mapped["Chat"] = relationship(back_populates="members")
-    user: Mapped["User"] = relationship()
-
-    __table_args__ = (
-        UniqueConstraint("chat_id", "user_id", name="chat_members_unique"),
+    chat_id: Mapped[UUID] = mapped_column(
+        ForeignKey("chats.id", ondelete="CASCADE"), primary_key=True
     )
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    joined_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    user: Mapped["User"] = relationship()
+    chat: Mapped["Chat"] = relationship(back_populates="members")

@@ -7,7 +7,6 @@ from src.core.di.database import get_session
 from src.repositories.chat import ChatRepository
 from src.repositories.chat_member import ChatMemberRepository
 from src.repositories.group import GroupRepository
-from src.repositories.group_member import GroupMemberRepository
 from src.repositories.message import MessageRepository
 from src.repositories.message_read_state import MessageReadStateRepository
 from src.repositories.user import UserRepository
@@ -35,12 +34,6 @@ def get_group_repository(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> GroupRepository:
     return GroupRepository(session)
-
-
-def get_group_member_repository(
-    session: Annotated[AsyncSession, Depends(get_session)],
-) -> GroupMemberRepository:
-    return GroupMemberRepository(session)
 
 
 def get_message_repository(

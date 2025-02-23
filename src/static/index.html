@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Test</title>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        button {
+            margin: 5px;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>WebSocket Тест</h2>
+
+        <div class="input-group">
+            <label>Token:</label><br>
+            <input type="text" id="token" style="width: 100%;" placeholder="Введите JWT токен">
+        </div>
+
+        <div class="input-group">
+            <label>Chat ID:</label><br>
+            <input type="text" id="chatId" style="width: 100%;" placeholder="Введите ID чата">
+        </div>
+
+        <button onclick="connect()">Подключиться</button>
+        <button onclick="joinChat()">Войти в чат</button>
+        <button onclick="leaveChat()">Выйти из чата</button>
+
+        <div class="input-group">
+            <label>Сообщение:</label><br>
+            <input type="text" id="messageText" style="width: 80%;" placeholder="Введите сообщение">
+            <button onclick="sendMessage()">Отправить</button>
+        </div>
+
+        <div id="messages"></div>
+    </div>
+
+    <script>
+        let ws = null;
+
+        function addMessage(message) {
+            const messagesDiv = document.getElementById('messages');
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            if (typeof message === 'object') {
+                messageElement.textContent = JSON.stringify(message, null, 2);
+            } else {
+                messageElement.textContent = message;
+            }
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function connect() {
+            const token = document.getElementById('token').value;
+            if (!token) {
+                alert('Введите токен');
+                return;
+            }
+
+            if (ws) {
+                ws.close();
+            }
+
+            // Используем window.location.host для определения текущего хоста
+            ws = new WebSocket(`ws://${window.location.host}/ws?token=${token}`);
+
+            ws.onopen = function() {
+                addMessage('WebSocket соединение установлено');
+            };
+
+            ws.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    addMessage(data);
+                } catch (e) {
+                    addMessage('Получено сообщение: ' + event.data);
+                }
+            };
+
+            ws.onclose = function(event) {
+                addMessage(`WebSocket соединение закрыто (код: ${event.code}, причина: ${event.reason || 'не указана'})`);
+                ws = null;
+            };
+
+            ws.onerror = function(error) {
+                addMessage('Ошибка WebSocket: ' + error.message);
+            };
+        }
+
+        function joinChat() {
+            if (!ws) {
+                alert('Сначала подключитесь к WebSocket');
+                return;
+            }
+
+            const chatId = document.getElementById('chatId').value;
+            if (!chatId) {
+                alert('Введите ID чата');
+                return;
+            }
+
+            ws.send(JSON.stringify({
+                action: 'join_chat',
+                chat_id: chatId
+            }));
+        }
+
+        function leaveChat() {
+            if (!ws) {
+                alert('Сначала подключитесь к WebSocket');
+                return;
+            }
+
+            const chatId = document.getElementById('chatId').value;
+            if (!chatId) {
+                alert('Введите ID чата');
+                return;
+            }
+
+            ws.send(JSON.stringify({
+                action: 'leave_chat',
+                chat_id: chatId
+            }));
+        }
+
+        function sendMessage() {
+            if (!ws) {
+                alert('Сначала подключитесь к WebSocket');
+                return;
+            }
+
+            const chatId = document.getElementById('chatId').value;
+            const messageText = document.getElementById('messageText').value;
+
+            if (!chatId || !messageText) {
+                alert('Введите ID чата и текст сообщения');
+                return;
+            }
+
+            ws.send(JSON.stringify({
+                action: 'send_message',
+                chat_id: chatId,
+                text: messageText
+            }));
+
+            document.getElementById('messageText').value = '';
+        }
+    </script>
+</body>
+</html>

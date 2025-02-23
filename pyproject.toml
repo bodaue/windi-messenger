@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Timur Kerimov <tim-online@mail.ru>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.13"
@@ -38,8 +39,8 @@ ignore = [
     "ANN401",
     "I001", "INP001",
     "FBT001", "FBT002",
-    "PLR0913",
-    "TRY003", "EM101", "EM102"
+    "PLR0913", "PLR0915",
+    "TRY003", "EM101", "EM102", "T201"
 ]
 
 [build-system]

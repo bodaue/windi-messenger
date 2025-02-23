@@ -13,7 +13,6 @@ uvicorn = "^0.34.0"
 pydantic-settings = "^2.7.1"
 sqlalchemy = { extras = ["asyncio"], version = "^2.0.38" }
 asyncpg = "^0.30.0"
-dishka = "^1.4.2"
 alembic = "^1.14.1"
 python-jose = { extras = ["cryptography"], version = "^3.4.0" }
 bcrypt = "^4.2.1"

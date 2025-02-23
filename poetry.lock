@@ -309,17 +309,6 @@ test = ["certifi (>=2024)", "cryptography-vectors (==44.0.1)", "pretend (>=0.7)"
 test-randomorder = ["pytest-randomly"]
 
 [[package]]
-name = "dishka"
-version = "1.4.2"
-description = "Cute DI framework with scopes and agreeable API"
-optional = false
-python-versions = ">=3.10"
-files = [
-    {file = "dishka-1.4.2-py3-none-any.whl", hash = "sha256:5a59c6bf5ac9f34b3e698093207ddb871c13a0721eeb3948eb29011aee61f69c"},
-    {file = "dishka-1.4.2.tar.gz", hash = "sha256:fe1e7b2d0df4306b39650cf4c05485aa79ce1fc31507d1f73300dec3c64b2397"},
-]
-
-[[package]]
 name = "dnspython"
 version = "2.7.0"
 description = "DNS toolkit"
@@ -1089,4 +1078,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.13"
-content-hash = "f3ea62ce1f715ce6f7beaccf183338cc4fbb802360cd55f2d60a84d6cde1a56d"
+content-hash = "e929683cc149ec066061336bd333fc67261a7755e8247ed9dbfc90ce46260c82"

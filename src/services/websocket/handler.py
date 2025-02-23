@@ -12,6 +12,7 @@ from src.schemas.websocket import (
     WSLeaveChat,
     WSSendMessage,
     WSMessageRead,
+    WSTyping,
 )
 from src.services.chat import ChatService
 from src.services.message import MessageService
@@ -39,6 +40,7 @@ class WebSocketHandler:
         """Обработка входящего сообщения."""
         try:
             data = json.loads(raw_data)
+            print(data)
             action = data.get("action")
 
             handlers = {
@@ -46,8 +48,9 @@ class WebSocketHandler:
                 WebSocketAction.LEAVE_CHAT: self._handle_leave_chat,
                 WebSocketAction.SEND_MESSAGE: self._handle_send_message,
                 WebSocketAction.MESSAGE_READ: self._handle_message_read,
+                WebSocketAction.TYPING: self._handle_typing,
             }
-
+            print(action)
             handler = handlers.get(action)
             if handler:
                 await handler(data)
@@ -96,6 +99,24 @@ class WebSocketHandler:
             self.user.id,
             read_message.read_at.isoformat(),
         )
+
+    async def _handle_typing(self, data: dict[str, Any]) -> None:
+        """Обработка события печатания."""
+        msg = WSTyping.model_validate(data)
+        # Проверяем доступ к чату
+        chat = await self.chat_service.get_chat_access(msg.chat_id, self.user)
+
+        if chat:
+            # Оповещаем других участников чата
+            await connection_manager.broadcast_message(
+                msg.chat_id,
+                {
+                    "event": "typing",
+                    "chat_id": str(msg.chat_id),
+                    "user_name": self.user.name,
+                },
+                exclude_user=self.user.id,
+            )
 
     async def _send_error(self, message: str) -> None:
         """Отправка сообщения об ошибке."""

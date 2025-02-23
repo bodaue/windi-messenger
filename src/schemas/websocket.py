@@ -9,10 +9,16 @@ class WebSocketAction(str, Enum):
     LEAVE_CHAT = "leave_chat"
     SEND_MESSAGE = "send_message"
     MESSAGE_READ = "message_read"
+    TYPING = "typing"
 
 
 class WSMessageBase(BaseModel):
     action: WebSocketAction
+
+
+class WSTyping(WSMessageBase):
+    action: WebSocketAction = WebSocketAction.TYPING
+    chat_id: UUID
 
 
 class WSJoinChat(WSMessageBase):

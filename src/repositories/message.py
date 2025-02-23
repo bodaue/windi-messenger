@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import select, desc
+from sqlalchemy import select, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -39,7 +39,7 @@ class MessageRepository:
                 selectinload(Message.sender),
                 selectinload(Message.read_states),
             )
-            .order_by(desc(Message.created_at))
+            .order_by(asc(Message.created_at))
             .limit(limit)
             .offset(offset)
         )

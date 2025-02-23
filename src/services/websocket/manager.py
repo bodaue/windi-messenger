@@ -9,7 +9,6 @@ from src.schemas.message import MessageInfo
 
 
 class ConnectionManager:
-
     def __init__(self) -> None:
         self.active_connections: dict[UUID, dict[str, WebSocket]] = defaultdict(dict)
         self.user_chats: dict[UUID, set[UUID]] = defaultdict(set)

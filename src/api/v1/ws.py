@@ -60,6 +60,6 @@ async def websocket_endpoint(
         except WebSocketDisconnect:
             await connection_manager.disconnect(user.id, connection_id)
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print(e, type(e))
         await websocket.close(code=4000, reason=str(e))

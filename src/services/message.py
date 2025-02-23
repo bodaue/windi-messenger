@@ -47,7 +47,7 @@ class MessageService:
             text=data.text,
         )
         await self._message_repository.create(message)
-
+        await self._session.flush()
         await self._message_read_state_repository.mark_as_read(
             message_id=message.id, user_id=sender.id
         )

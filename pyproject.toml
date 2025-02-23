@@ -17,6 +17,7 @@ alembic = "^1.14.1"
 python-jose = { extras = ["cryptography"], version = "^3.4.0" }
 bcrypt = "^4.2.1"
 pydantic = { extras = ["email"], version = "^2.10.6" }
+websockets = "^15.0"
 
 
 [tool.poetry.group.dev.dependencies]

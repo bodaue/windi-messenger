@@ -1,3 +1,4 @@
+from datetime import datetime, UTC
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,7 +16,6 @@ class MessageReadStateRepository:
         user_id: UUID,
     ) -> None:
         read_state = MessageReadState(
-            message_id=message_id,
-            user_id=user_id,
+            message_id=message_id, user_id=user_id, read_at=datetime.now(UTC)
         )
         self._session.add(read_state)

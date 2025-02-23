@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.exceptions import (
@@ -63,3 +65,13 @@ class ChatService:
     async def get_user_chats(self, user: User) -> list[ChatInfo]:
         chats = await self._chat_repository.get_user_chats(user.id)
         return [ChatInfo.model_validate(chat) for chat in chats]
+
+    async def get_chat_access(self, chat_id: UUID, user: User) -> Chat | None:
+        chat = await self._chat_repository.get_by_id(chat_id)
+        if not chat:
+            return None
+
+        if any(member.user_id == user.id for member in chat.members):
+            return chat
+
+        return None

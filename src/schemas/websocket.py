@@ -35,6 +35,7 @@ class WSSendMessage(WSMessageBase):
     action: WebSocketAction = WebSocketAction.SEND_MESSAGE
     chat_id: UUID
     text: str = Field(min_length=1, max_length=4096)
+    idempotency_key: str = Field(min_length=1, max_length=64)
 
 
 class WSMessageRead(WSMessageBase):

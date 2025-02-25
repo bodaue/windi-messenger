@@ -80,7 +80,9 @@ class WebSocketHandler:
     async def _handle_send_message(self, data: dict[str, Any]) -> None:
         """Обработка отправки сообщения."""
         msg = WSSendMessage.model_validate(data)
-        message_data = MessageCreate(chat_id=msg.chat_id, text=msg.text)
+        message_data = MessageCreate(
+            chat_id=msg.chat_id, text=msg.text, idempotency_key=msg.idempotency_key
+        )
         message = await self.message_service.create_message(message_data, self.user)
 
         await connection_manager.broadcast_message(

@@ -9,6 +9,7 @@ from src.schemas.user import UserInfo
 class MessageCreate(BaseModel):
     chat_id: UUID
     text: str = Field(min_length=1, max_length=4096)
+    idempotency_key: str = Field(min_length=1, max_length=64)
 
 
 class MessageRead(BaseModel):
@@ -24,6 +25,7 @@ class MessageInfo(BaseModel):
     created_at: datetime
     is_read: bool = False
     read_at: datetime | None = None
+    idempotency_key: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

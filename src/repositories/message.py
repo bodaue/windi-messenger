@@ -45,3 +45,19 @@ class MessageRepository:
         )
         result = await self._session.scalars(stmt)
         return list(result)
+
+    async def find_by_idempotency_key(
+        self, sender_id: UUID, idempotency_key: str
+    ) -> Message | None:
+        stmt = (
+            select(Message)
+            .where(
+                Message.sender_id == sender_id,
+                Message.idempotency_key == idempotency_key,
+            )
+            .options(
+                selectinload(Message.sender),
+                selectinload(Message.read_states),
+            )
+        )
+        return await self._session.scalar(stmt)

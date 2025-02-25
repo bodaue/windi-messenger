@@ -41,10 +41,17 @@ class MessageService:
         if not any(member.user_id == sender.id for member in chat.members):
             raise ChatNotFoundException
 
+        existing_message = await self._message_repository.find_by_idempotency_key(
+            sender_id=sender.id, idempotency_key=data.idempotency_key
+        )
+        if existing_message:
+            return MessageInfo.model_validate(existing_message)
+
         message = Message(
             chat_id=data.chat_id,
             sender_id=sender.id,
             text=data.text,
+            idempotency_key=data.idempotency_key,
         )
         await self._message_repository.create(message)
         await self._session.flush()

@@ -276,6 +276,7 @@
     let ws = null;
     let currentUserId = null;
     let typingTimeout = null;
+    let pendingMessages = {}; // Для отслеживания отправленных сообщений
 
     function updateConnectionStatus(connected) {
         const statusBar = document.getElementById('connectionStatus');
@@ -307,6 +308,12 @@
             const isOutgoing = message.sender?.id === currentUserId;
             messageElement.className = `message ${isOutgoing ? 'outgoing' : 'incoming'}`;
             messageElement.dataset.messageId = message.id;
+
+            // Если это отправленное сообщение и у нас есть ожидающее с тем же idempotency_key,
+            // удаляем его из ожидающих
+            if (isOutgoing && message.idempotency_key && pendingMessages[message.idempotency_key]) {
+                delete pendingMessages[message.idempotency_key];
+            }
 
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
@@ -431,6 +438,11 @@
         document.getElementById('sendMessageBtn').disabled = true;
     }
 
+    function generateIdempotencyKey() {
+        // Генерация простого уникального идентификатора на основе timestamp и случайного числа
+        return `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+    }
+
     function sendMessage() {
         if (!ws) {
             alert('Сначала подключитесь к WebSocket');
@@ -445,13 +457,25 @@
             return;
         }
 
+        const idempotencyKey = generateIdempotencyKey();
+
+        // Сохраняем сообщение как ожидающее отправки
+        pendingMessages[idempotencyKey] = {
+            text: messageText,
+            time: new Date()
+        };
+
+        // Отправляем сообщение с идемпотентным ключом
         ws.send(JSON.stringify({
             action: 'send_message',
             chat_id: chatId,
-            text: messageText
+            text: messageText,
+            idempotency_key: idempotencyKey
         }));
 
         document.getElementById('messageText').value = '';
+
+        // Механизм повторной отправки удален
     }
 
     function handleKeyPress(event) {

@@ -24,10 +24,18 @@ class Message(IdMixin, TimestampMixin, Base):
 
     text: Mapped[str] = mapped_column(String(4096))
 
+    idempotency_key: Mapped[str | None] = mapped_column(String(64))
+
     read_states: Mapped[list["MessageReadState"]] = relationship(
         back_populates="message"
     )
-    __table_args__ = (Index("ix_messages_chat_created", "chat_id", "created_at"),)
+
+    __table_args__ = (
+        Index("ix_messages_chat_created", "chat_id", "created_at"),
+        UniqueConstraint(
+            "sender_id", "idempotency_key", name="uq_sender_idempotency_key"
+        ),
+    )
 
 
 class MessageReadState(IdMixin, Base):
